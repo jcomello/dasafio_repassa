@@ -120,6 +120,36 @@ RSpec.describe Admin::PerformanceEvaluationsController, type: :controller do
     end
   end
 
+  describe "#show" do
+    let(:employee) { FactoryBot.create(:employee, name: "Johnny Lee Hoocker") }
+    let!(:performance_evaluation) do
+      FactoryBot.create(:performance_evaluation, title: "Good, but not really", description: "Some long text...", employee: employee)
+    end
+
+    let(:params) do
+      { id: performance_evaluation.id }
+    end
+
+    it "shows a performance evaluation" do
+      get :show, params: params
+      expect(assigns(:performance_evaluation).id).to eql(performance_evaluation.id)
+    end
+
+    it "brings code 200 ok" do
+      get :show, params: params
+      expect(response.code).to eq('200')
+    end
+
+    it "responds the performance evaluation" do
+      get :show, params: params
+      parsed_response = JSON.parse(response.body)
+
+      expect(parsed_response["title"]).to eql("Good, but not really")
+      expect(parsed_response["description"]).to eql("Some long text...")
+      expect(parsed_response["employee_id"]).to eql(employee.id)
+    end
+  end
+
   describe "#destroy" do
     let(:employee) { FactoryBot.create(:employee, name: "Johnny Lee Hoocker") }
     let!(:performance_evaluation) { FactoryBot.create(:performance_evaluation, title: "Good, but not really", employee: employee) }
