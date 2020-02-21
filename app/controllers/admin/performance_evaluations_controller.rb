@@ -1,5 +1,5 @@
 class Admin::PerformanceEvaluationsController < ApplicationController
-  before_action :find_performance_evaluation, only: :update
+  before_action :find_performance_evaluation, only: %i[update destroy]
 
   def create
     @performance_evaluation = PerformanceEvaluation.new(performance_evaluation_params)
@@ -18,6 +18,10 @@ class Admin::PerformanceEvaluationsController < ApplicationController
     else
       render json: @performance_evaluation.reload.errors, status: :unprocessable_entity
     end
+  end
+
+  def destroy
+    @performance_evaluation.destroy
   end
 
   private

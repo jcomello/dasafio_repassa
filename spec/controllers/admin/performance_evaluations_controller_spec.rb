@@ -119,4 +119,27 @@ RSpec.describe Admin::PerformanceEvaluationsController, type: :controller do
       end
     end
   end
+
+  describe "#destroy" do
+    let(:employee) { FactoryBot.create(:employee, name: "Johnny Lee Hoocker") }
+    let!(:performance_evaluation) { FactoryBot.create(:performance_evaluation, title: "Good, but not really", employee: employee) }
+
+    let(:params) do
+      { id: performance_evaluation.id }
+    end
+
+    it "deletes a performance evaluation" do
+      expect { delete :destroy, params: params }.to change(PerformanceEvaluation, :count).by(-1)
+    end
+
+    it "deletes the correct performance evaluation" do
+      delete :destroy, params: params
+      expect(assigns(:performance_evaluation).id).to eql(performance_evaluation.id)
+    end
+
+    it "brings code 204 No Content" do
+      delete :destroy, params: params
+      expect(response.code).to eq('204')
+    end
+  end
 end
