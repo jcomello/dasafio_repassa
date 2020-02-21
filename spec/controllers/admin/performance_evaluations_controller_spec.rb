@@ -59,4 +59,64 @@ RSpec.describe Admin::PerformanceEvaluationsController, type: :controller do
       end
     end
   end
+
+  describe "#update" do
+    let(:employee) { FactoryBot.create(:employee, name: "Johnny Lee Hoocker") }
+    let(:other_employee) { FactoryBot.create(:employee, name: "Johnny Winter") }
+    let!(:performance_evaluation) { FactoryBot.create(:performance_evaluation, title: "Good, but not really", employee: employee) }
+
+    let(:params) do
+      {
+        id: performance_evaluation.id,
+        title: "Not so good",
+        employee_id: other_employee.id
+      }
+    end
+
+    it "updates a performance evaluation" do
+      put :update, params: params
+      expect(assigns(:performance_evaluation).title).to eql("Not so good")
+      expect(assigns(:performance_evaluation).employee_id).to eql(other_employee.id)
+    end
+
+    it "brings code 200 ok" do
+      put :update, params: params
+      expect(response.code).to eq('200')
+    end
+
+    it "responds the updated performance evaluation" do
+      put :update, params: params
+      parsed_response = JSON.parse(response.body)
+
+      expect(parsed_response["title"]).to eql("Not so good")
+      expect(parsed_response["description"]).to eql(performance_evaluation.description)
+      expect(parsed_response["employee_id"]).to eql(other_employee.id)
+    end
+
+    context "when params are invalid" do
+      let(:params) do
+        {
+          id: performance_evaluation.id,
+          title: ""
+        }
+      end
+
+      it "does not update the performance evaluation" do
+        put :update, params: params
+        expect(assigns(:performance_evaluation).reload.title).to eql("Good, but not really")
+      end
+
+      it "brings code 422" do
+        put :update, params: params
+        expect(response.code).to eq('422')
+      end
+
+      it "responds the errors" do
+        put :update, params: params
+        parsed_response = JSON.parse(response.body)
+
+        expect(parsed_response["title"]).to include("can't be blank")
+      end
+    end
+  end
 end
