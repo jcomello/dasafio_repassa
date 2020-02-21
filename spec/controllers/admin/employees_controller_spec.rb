@@ -118,7 +118,7 @@ RSpec.describe Admin::EmployeesController, type: :controller do
       expect(response.code).to eq('200')
     end
 
-    it "responds the updated employee" do
+    it "responds the employee" do
       get :show, params: params
       parsed_response = JSON.parse(response.body)
 
