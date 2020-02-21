@@ -101,6 +101,31 @@ RSpec.describe Admin::EmployeesController, type: :controller do
     end
   end
 
+  describe "#show" do
+    let!(:employee) { FactoryBot.create(:employee, name: "Johnny Lee Hoocker") }
+
+    let(:params) do
+      { id: employee.id }
+    end
+
+    it "shows an employee" do
+      get :show, params: params
+      expect(assigns(:employee).id).to eql(employee.id)
+    end
+
+    it "brings code 200 ok" do
+      get :show, params: params
+      expect(response.code).to eq('200')
+    end
+
+    it "responds the updated employee" do
+      get :show, params: params
+      parsed_response = JSON.parse(response.body)
+
+      expect(parsed_response["name"]).to eql("Johnny Lee Hoocker")
+    end
+  end
+
   describe "#destroy" do
     let!(:employee) { FactoryBot.create(:employee, name: "Johnny Lee Hoocker") }
 

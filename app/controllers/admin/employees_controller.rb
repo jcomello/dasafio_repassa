@@ -1,5 +1,5 @@
 class Admin::EmployeesController < ApplicationController
-  before_action :find_employee, only: %i[update destroy]
+  before_action :find_employee, only: %i[update destroy show]
 
   def create
     @employee = Employee.new(employee_params)
@@ -8,6 +8,10 @@ class Admin::EmployeesController < ApplicationController
     else
       render json: @employee.errors, status: :unprocessable_entity
     end
+  end
+
+  def show
+    render json: @employee, status: :ok
   end
 
   def update
