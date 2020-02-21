@@ -100,4 +100,26 @@ RSpec.describe Admin::EmployeesController, type: :controller do
       end
     end
   end
+
+  describe "#destroy" do
+    let!(:employee) { FactoryBot.create(:employee, name: "Johnny Lee Hoocker") }
+
+    let(:params) do
+      { id: employee.id }
+    end
+
+    it "deletes an employee" do
+      expect { delete :destroy, params: params }.to change(Employee, :count).by(-1)
+    end
+
+    it "deletes the correct employee" do
+      delete :destroy, params: params
+      expect(assigns(:employee).id).to eql(employee.id)
+    end
+
+    it "brings code 204 No Content" do
+      delete :destroy, params: params
+      expect(response.code).to eq('204')
+    end
+  end
 end
