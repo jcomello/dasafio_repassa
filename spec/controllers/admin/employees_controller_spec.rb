@@ -5,6 +5,32 @@ RSpec.describe Admin::EmployeesController, type: :controller do
 
   before { api_sign_in(admin_user) }
 
+  describe "#index" do
+    let!(:other_admin_user) { FactoryBot.create(:admin_user) }
+
+    let!(:employee1) { FactoryBot.create(:employee, name: "Johnny Lee Hoocker", admin_user_id: admin_user.id) }
+    let!(:employee2) { FactoryBot.create(:employee, name: "Johnny Winter", admin_user_id: admin_user.id) }
+    let!(:employee3) { FactoryBot.create(:employee, name: "Joe Sebastian", admin_user_id: admin_user.id) }
+    let!(:employee_from_other_admin_user) { FactoryBot.create(:employee, name: "Claudio", admin_user_id: other_admin_user.id) }
+
+    it "assigns the employees" do
+      get :index
+      expect(assigns(:employees)).to contain_exactly(employee1, employee2, employee3)
+    end
+
+    it "brings code 200 ok" do
+      get :index
+      expect(response.code).to eq('200')
+    end
+
+    it "responds the employees" do
+      get :index
+      parsed_response = JSON.parse(response.body).map { |employee_hash| employee_hash["name"] }
+
+      expect(parsed_response).to contain_exactly("Johnny Lee Hoocker", "Johnny Winter", "Joe Sebastian")
+    end
+  end
+
   describe "#create" do
     let(:params) do
       { name: "Johnny Winter" }
@@ -126,7 +152,7 @@ RSpec.describe Admin::EmployeesController, type: :controller do
       { id: employee.id }
     end
 
-    it "shows an employee" do
+    it "assigns correct employee" do
       get :show, params: params
       expect(assigns(:employee).id).to eql(employee.id)
     end

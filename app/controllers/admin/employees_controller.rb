@@ -1,6 +1,11 @@
 class Admin::EmployeesController < Admin::ApplicationController
   before_action :find_employee, only: %i[update destroy show]
 
+  def index
+    @employees = current_admin_user.employees
+    render json: @employees, status: :ok
+  end
+
   def create
     @employee = current_admin_user.employees.new(employee_params)
     if @employee.save
