@@ -6,6 +6,6 @@ Rails.application.routes.draw do
   end
 
   namespace :employee do
-    resources :performance_evaluations, only: :index
+    resources :performance_evaluations, only: %i[index show]
   end
 end
