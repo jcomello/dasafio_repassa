@@ -1,8 +1,12 @@
 require 'rails_helper'
 
-RSpec.describe Admin::PerformanceEvaluationsController, type: :controller do
+RSpec.describe Admin::PerformanceEvaluationsController, type: :controller do\
+  let!(:admin_user) { FactoryBot.create(:admin_user) }
+
+  before { api_sign_in(admin_user) }
+  let(:employee) { FactoryBot.create(:employee, admin_user_id: admin_user.id) }
+
   describe "#create" do
-    let(:employee) { FactoryBot.create(:employee) }
     let(:params) do
       {
         title: "Very Good",
@@ -61,8 +65,7 @@ RSpec.describe Admin::PerformanceEvaluationsController, type: :controller do
   end
 
   describe "#update" do
-    let(:employee) { FactoryBot.create(:employee, name: "Johnny Lee Hoocker") }
-    let(:other_employee) { FactoryBot.create(:employee, name: "Johnny Winter") }
+    let(:other_employee) { FactoryBot.create(:employee, name: "Johnny Winter", admin_user_id: admin_user.id) }
     let!(:performance_evaluation) { FactoryBot.create(:performance_evaluation, title: "Good, but not really", employee: employee) }
 
     let(:params) do
@@ -121,7 +124,6 @@ RSpec.describe Admin::PerformanceEvaluationsController, type: :controller do
   end
 
   describe "#show" do
-    let(:employee) { FactoryBot.create(:employee, name: "Johnny Lee Hoocker") }
     let!(:performance_evaluation) do
       FactoryBot.create(:performance_evaluation, title: "Good, but not really", description: "Some long text...", employee: employee)
     end
@@ -151,7 +153,6 @@ RSpec.describe Admin::PerformanceEvaluationsController, type: :controller do
   end
 
   describe "#destroy" do
-    let(:employee) { FactoryBot.create(:employee, name: "Johnny Lee Hoocker") }
     let!(:performance_evaluation) { FactoryBot.create(:performance_evaluation, title: "Good, but not really", employee: employee) }
 
     let(:params) do

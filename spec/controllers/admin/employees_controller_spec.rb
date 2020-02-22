@@ -1,6 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe Admin::EmployeesController, type: :controller do
+  let!(:admin_user) { FactoryBot.create(:admin_user) }
+
+  before { api_sign_in(admin_user) }
+
   describe "#create" do
     let(:params) do
       { name: "Johnny Winter" }
@@ -48,7 +52,7 @@ RSpec.describe Admin::EmployeesController, type: :controller do
   end
 
   describe "#update" do
-    let!(:employee) { FactoryBot.create(:employee, name: "Johnny Lee Hoocker") }
+    let!(:employee) { FactoryBot.create(:employee, name: "Johnny Lee Hoocker", admin_user_id: admin_user.id) }
 
     let(:params) do
       {
@@ -99,10 +103,24 @@ RSpec.describe Admin::EmployeesController, type: :controller do
         expect(parsed_response["name"]).to include("can't be blank")
       end
     end
+
+    context "when employee requested belongs to another admin user" do
+      let!(:other_admin_user) { FactoryBot.create(:admin_user) }
+      let(:params) do
+        { id: employee.id }
+      end
+
+      before { api_sign_in(other_admin_user) }
+
+      it "brings code 404 not found" do
+        put :update, params: params
+        expect(response.code).to eq('404')
+      end
+    end
   end
 
   describe "#show" do
-    let!(:employee) { FactoryBot.create(:employee, name: "Johnny Lee Hoocker") }
+    let!(:employee) { FactoryBot.create(:employee, name: "Johnny Lee Hoocker", admin_user_id: admin_user.id) }
 
     let(:params) do
       { id: employee.id }
@@ -124,10 +142,24 @@ RSpec.describe Admin::EmployeesController, type: :controller do
 
       expect(parsed_response["name"]).to eql("Johnny Lee Hoocker")
     end
+
+    context "when employee requested belongs to another admin user" do
+      let!(:other_admin_user) { FactoryBot.create(:admin_user) }
+      let(:params) do
+        { id: employee.id }
+      end
+
+      before { api_sign_in(other_admin_user) }
+
+      it "brings code 404 not found" do
+        get :show, params: params
+        expect(response.code).to eq('404')
+      end
+    end
   end
 
   describe "#destroy" do
-    let!(:employee) { FactoryBot.create(:employee, name: "Johnny Lee Hoocker") }
+    let!(:employee) { FactoryBot.create(:employee, name: "Johnny Lee Hoocker", admin_user_id: admin_user.id) }
 
     let(:params) do
       { id: employee.id }
@@ -145,6 +177,20 @@ RSpec.describe Admin::EmployeesController, type: :controller do
     it "brings code 204 No Content" do
       delete :destroy, params: params
       expect(response.code).to eq('204')
+    end
+
+    context "when employee requested belongs to another admin user" do
+      let!(:other_admin_user) { FactoryBot.create(:admin_user) }
+      let(:params) do
+        { id: employee.id }
+      end
+
+      before { api_sign_in(other_admin_user) }
+
+      it "brings code 404 not found" do
+        delete :destroy, params: params
+        expect(response.code).to eq('404')
+      end
     end
   end
 end

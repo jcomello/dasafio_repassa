@@ -1,8 +1,8 @@
-class Admin::EmployeesController < ApplicationController
+class Admin::EmployeesController < Admin::ApplicationController
   before_action :find_employee, only: %i[update destroy show]
 
   def create
-    @employee = Employee.new(employee_params)
+    @employee = current_admin_user.employees.new(employee_params)
     if @employee.save
       render json: @employee, status: :created
     else
@@ -31,7 +31,9 @@ class Admin::EmployeesController < ApplicationController
   private
 
   def find_employee
-    @employee = Employee.find(params[:id])
+    @employee = current_admin_user.employees.find(params[:id])
+  rescue
+    render status: :not_found
   end
 
   def employee_params

@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Employee, type: :model do
   describe "associations" do
-    it { is_expected.to have_many(:perfoermance_evaluations) }
+    it { is_expected.to have_many(:performance_evaluations) }
   end
 
   describe "validations" do
