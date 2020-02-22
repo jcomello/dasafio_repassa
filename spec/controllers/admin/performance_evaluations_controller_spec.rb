@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Admin::PerformanceEvaluationsController, type: :controller do\
+RSpec.describe Admin::PerformanceEvaluationsController, type: :controller do
   let!(:admin_user) { FactoryBot.create(:admin_user) }
   let(:employee) { FactoryBot.create(:employee, admin_user_id: admin_user.id) }
 

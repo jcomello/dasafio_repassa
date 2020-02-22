@@ -4,4 +4,8 @@ Rails.application.routes.draw do
     resources :performance_evaluations, only: %i[index create update destroy show]
     resource :admin_user, only: :create
   end
+
+  namespace :employee do
+    resources :performance_evaluations, only: :index
+  end
 end
