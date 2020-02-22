@@ -3,6 +3,7 @@ require 'rails_helper'
 RSpec.describe AdminUser, type: :model do
   describe "associations" do
     it { is_expected.to have_many(:employees) }
+    it { is_expected.to have_many(:performance_evaluations).through(:employees) }
   end
 
   describe "validations" do

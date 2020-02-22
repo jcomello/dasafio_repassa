@@ -1,6 +1,11 @@
 class Admin::PerformanceEvaluationsController < Admin::ApplicationController
   before_action :find_performance_evaluation, only: %i[update destroy show]
 
+  def index
+    @performance_evaluations = current_admin_user.performance_evaluations
+    render json: @performance_evaluations, status: :ok
+  end
+
   def create
     @performance_evaluation = PerformanceEvaluation.new(performance_evaluation_params)
     if @performance_evaluation.save
