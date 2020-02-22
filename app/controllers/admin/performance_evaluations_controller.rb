@@ -36,7 +36,9 @@ class Admin::PerformanceEvaluationsController < Admin::ApplicationController
   private
 
   def find_performance_evaluation
-    @performance_evaluation = PerformanceEvaluation.find(params[:id])
+    @performance_evaluation = current_admin_user.performance_evaluations.find(params[:id])
+  rescue
+    return render status: :not_found
   end
 
   def performance_evaluation_params

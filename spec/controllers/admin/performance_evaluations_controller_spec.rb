@@ -170,22 +170,37 @@ RSpec.describe Admin::PerformanceEvaluationsController, type: :controller do
     end
 
     context "when employee setted is from another admin_user" do
-        let!(:other_admin_user) { FactoryBot.create(:admin_user) }
-        let(:employee) { FactoryBot.create(:employee, admin_user_id: other_admin_user.id) }
-        let(:params) do
-          {
-            id: performance_evaluation.id,
-            employee_id: employee.id
-          }
-        end
-
-        it "responds the errors" do
-          put :update, params: params
-          parsed_response = JSON.parse(response.body)
-
-          expect(parsed_response["employee_id"]).to include("does not exist")
-        end
+      let(:params) do
+        {
+          id: performance_evaluation.id,
+          employee_id: "randon-value"
+        }
       end
+
+      it "responds the errors" do
+        put :update, params: params
+        parsed_response = JSON.parse(response.body)
+
+        expect(parsed_response["employee_id"]).to include("does not exist")
+      end
+    end
+
+    context "when performance evaluation is from another employee" do
+      let(:other_employee) { FactoryBot.create(:employee) }
+      let!(:evaluation) { FactoryBot.create(:performance_evaluation, title: "Very well", employee: other_employee) }
+
+      let(:params) do
+        {
+          id: evaluation.id,
+          Title: "some title"
+        }
+      end
+
+      it "brings code 404 not found" do
+        put :update, params: params
+        expect(response.code).to eq('404')
+      end
+    end
   end
 
   describe "#show" do
@@ -215,6 +230,20 @@ RSpec.describe Admin::PerformanceEvaluationsController, type: :controller do
       expect(parsed_response["description"]).to eql("Some long text...")
       expect(parsed_response["employee_id"]).to eql(employee.id)
     end
+
+    context "when performance evaluation is from another employee" do
+      let(:other_employee) { FactoryBot.create(:employee) }
+      let!(:evaluation) { FactoryBot.create(:performance_evaluation, title: "Very well", employee: other_employee) }
+
+      let(:params) do
+        { id: evaluation.id }
+      end
+
+      it "brings code 404 not found" do
+        get :show, params: params
+        expect(response.code).to eq('404')
+      end
+    end
   end
 
   describe "#destroy" do
@@ -236,6 +265,20 @@ RSpec.describe Admin::PerformanceEvaluationsController, type: :controller do
     it "brings code 204 No Content" do
       delete :destroy, params: params
       expect(response.code).to eq('204')
+    end
+
+    context "when performance evaluation is from another employee" do
+      let(:other_employee) { FactoryBot.create(:employee) }
+      let!(:evaluation) { FactoryBot.create(:performance_evaluation, title: "Very well", employee: other_employee) }
+
+      let(:params) do
+        { id: evaluation.id }
+      end
+
+      it "brings code 404 not found" do
+        delete :destroy, params: params
+        expect(response.code).to eq('404')
+      end
     end
   end
 end
