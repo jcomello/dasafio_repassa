@@ -1,12 +1,14 @@
 require "rails_helper"
 
-class AdminTestsController < Admin::ApplicationController ; end
+class EmployeeTestsController < Employee::ApplicationController ; end
 
-RSpec.describe Admin::ApplicationController, :type => :controller do
-  let!(:admin_user) { FactoryBot.create(:admin_user, token: "random-token") }
+RSpec.describe Employee::ApplicationController, :type => :controller do
+  let(:admin_user) { FactoryBot.create(:admin_user) }
   let(:credentials) { authenticate_with_token("random-token") }
 
-  controller AdminTestsController do
+  let!(:employee) { FactoryBot.create(:employee, admin_user_id: admin_user.id, token: "random-token") }
+
+  controller EmployeeTestsController do
     def index
       render json: { message: "Hello world!" }
     end
