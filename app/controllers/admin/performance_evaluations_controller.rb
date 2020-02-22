@@ -1,4 +1,4 @@
-class Admin::PerformanceEvaluationsController < ApplicationController
+class Admin::PerformanceEvaluationsController < Admin::ApplicationController
   before_action :find_performance_evaluation, only: %i[update destroy show]
 
   def create
@@ -35,6 +35,6 @@ class Admin::PerformanceEvaluationsController < ApplicationController
   end
 
   def performance_evaluation_params
-    params.permit(:title, :description, :employee_id)
+    params.permit(:title, :description, :employee_id).merge(current_admin_user: current_admin_user)
   end
 end

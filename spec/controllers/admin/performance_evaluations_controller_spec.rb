@@ -2,9 +2,9 @@ require 'rails_helper'
 
 RSpec.describe Admin::PerformanceEvaluationsController, type: :controller do\
   let!(:admin_user) { FactoryBot.create(:admin_user) }
+  let(:employee) { FactoryBot.create(:employee, admin_user_id: admin_user.id) }
 
   before { api_sign_in(admin_user) }
-  let(:employee) { FactoryBot.create(:employee, admin_user_id: admin_user.id) }
 
   describe "#create" do
     let(:params) do
@@ -60,6 +60,25 @@ RSpec.describe Admin::PerformanceEvaluationsController, type: :controller do\
         expect(parsed_response["title"]).to include("can't be blank")
         expect(parsed_response["description"]).to include("can't be blank")
         expect(parsed_response["employee_id"]).to include("can't be blank")
+      end
+
+      context "when employee setted is from another admin_user" do
+        let!(:other_admin_user) { FactoryBot.create(:admin_user) }
+        let(:employee) { FactoryBot.create(:employee, admin_user_id: other_admin_user.id) }
+        let(:params) do
+          {
+            title: "Nice",
+            description: "some text about the employee",
+            employee_id: employee.id
+          }
+        end
+
+        it "responds the errors" do
+          post :create, params: params
+          parsed_response = JSON.parse(response.body)
+
+          expect(parsed_response["employee_id"]).to include("does not exist")
+        end
       end
     end
   end
@@ -121,6 +140,24 @@ RSpec.describe Admin::PerformanceEvaluationsController, type: :controller do\
         expect(parsed_response["title"]).to include("can't be blank")
       end
     end
+
+    context "when employee setted is from another admin_user" do
+        let!(:other_admin_user) { FactoryBot.create(:admin_user) }
+        let(:employee) { FactoryBot.create(:employee, admin_user_id: other_admin_user.id) }
+        let(:params) do
+          {
+            id: performance_evaluation.id,
+            employee_id: employee.id
+          }
+        end
+
+        it "responds the errors" do
+          put :update, params: params
+          parsed_response = JSON.parse(response.body)
+
+          expect(parsed_response["employee_id"]).to include("does not exist")
+        end
+      end
   end
 
   describe "#show" do
